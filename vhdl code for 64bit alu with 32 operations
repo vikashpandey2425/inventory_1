@@ -1,0 +1,169 @@
+# library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+-- Uncomment the following lines to use the declarations that are
+-- provided for instantiating Xilinx primitive components.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+entity sixtyfour_bitalu is
+generic( 
+	constant N: natural:= 1);
+    Port ( a : in std_logic_vector(63 downto 0);
+           b : in std_logic_vector(63 downto 0);
+           sel : in std_logic_vector(4 downto 0);
+           outalu : out std_logic_vector(63 downto 0);
+			  carryout : out std_logic);
+end sixtyfour_bitalu;
+
+architecture Behavioral of sixtyfour_bitalu is
+signal ALU_result:std_logic_vector(63 downto 0);
+signal temp:std_logic_vector(64 downto 0);
+begin
+process(a,b,sel)
+begin
+case sel is 
+ when "00000" =>
+ ALU_result <= a + b;--addition
+ when "00001" =>
+ ALU_result <= a - b;--substraction b from a
+ when "00010" =>
+ ALU_result <= a - b;--subtraction	a from b
+ when "00011" =>
+ ALU_result <= a - 1;--decrement 1 in a
+ when "00100" =>
+ ALU_result <= a + 1;--increment 1 in a
+ when "00101" =>
+ ALU_result <= b - 1;--decrement 1 in b
+ when "00110" =>
+ ALU_result <= b + 1;--increment 1 in b
+ when "00111"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(a(63 downto 0)) sll 1); --left shift a
+ when "01000"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(a(63 downto 0)) srl 1); --right shift a
+ when "01001"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(a(63 downto 0)) rol 1); --left rotate a
+ when "01010"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(a(63 downto 0)) ror 1); --left rotate a
+ when "01011" =>
+  ALU_result <= to_stdlogicvector(to_bitvector(b(63 downto 0)) sll 1); --left shift b
+ when "01100"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(b(63 downto 0)) srl 1); --right shift b
+ when "01101"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(b(63 downto 0)) rol 1); --left rotate b
+ when "01110"=>
+ ALU_result <= to_stdlogicvector(to_bitvector(b(63 downto 0)) ror 1); --left rotate b
+  when "01111" =>
+ ALU_result <= a and b;--and gate
+ when "10000" =>
+ ALU_result <= a or b;-- or gate
+ when "10001" =>
+ ALU_result <= not a ;--not gate
+ when "10010" =>
+ ALU_result <= not b;--not b
+ when "10011" =>
+ ALU_result <= a xor b ;--xor gate
+ when "10100" =>
+ ALU_result <= a xnor b ;--xnor gate
+ when "10101" =>
+ ALU_result <= a nor b ;--nor gate
+ when "10110" =>
+ ALU_result <= a nand b ;--nand gate
+ when "10111" =>
+ ALU_result <= a ; -- a buffer
+ when "11000" =>
+ ALU_result <= not(a)+ x"0000000000000001";-- 2's compliment
+ when "11001" =>
+ ALU_result <= not(b)+ x"0000000000000001";-- 2's compliment
+ when "11010" =>
+ ALU_result <= a + x"0000000000000011"; -- excess 3 (a)
+ when "11011" =>
+ ALU_result <= b + x"0000000000000011";	-- excess 3 (b)
+when "11100" =>
+ if(a>b) then
+ ALU_result <= x"0000000000000001";
+ else				
+ ALU_result <= x"0000000000000000" ; --grater comparison
+ end if;
+ when "11101" =>
+ if(a=b) then
+ ALU_result <= x"0000000000000001";
+ else				
+ ALU_result <= x"0000000000000000" ; --equal comparison
+ end if;
+when "11110" =>-- b buffer
+ ALU_result <= b ;
+when"11111"=>	--gray to binary
+ ALU_result(63)<= a(63);
+ ALU_result(62)<= a(63)xor a(62); 
+ ALU_result(61)<= a(63)xor a(62)xor a(61); 
+ ALU_result(60)<= a(60)xor a(61)xor a(62) xor a(63);
+ ALU_result(59)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59); 
+ ALU_result(58)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59)xor a(58); 
+ ALU_result(57)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57); 
+ ALU_result(56)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56);
+ ALU_result(55)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55);
+ ALU_result(54)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54); 
+ ALU_result(53)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53); 
+ ALU_result(52)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52);
+ ALU_result(51)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51); 
+ ALU_result(50)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50); 
+ ALU_result(49)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49); 
+ ALU_result(48)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48);
+ ALU_result(47)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47);
+ ALU_result(46)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46); 
+ ALU_result(45)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45);
+ ALU_result(44)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44);
+ ALU_result(43)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43); 
+ ALU_result(42)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42);
+ ALU_result(41)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41);
+ ALU_result(40)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40); 
+ ALU_result(39)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39);
+ ALU_result(38)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38);
+ ALU_result(37)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37);
+ ALU_result(36)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36);
+ ALU_result(35)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35);
+ ALU_result(34)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34);
+ ALU_result(33)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33);
+ ALU_result(32)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32);
+ ALU_result(31)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31);
+ ALU_result(30)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(31);
+ ALU_result(29)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29);
+ ALU_result(28)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28);
+ ALU_result(27)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27);
+ ALU_result(26)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26); 
+ ALU_result(25)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25); 
+ ALU_result(24)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24); 
+ ALU_result(23)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23);
+ ALU_result(22)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22);
+ ALU_result(21)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21); 
+ ALU_result(20)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20);
+ ALU_result(19)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19);
+ ALU_result(18)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18); 
+ ALU_result(17)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17);
+ ALU_result(16)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16);
+ ALU_result(15)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15); 
+ ALU_result(14)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14);
+ ALU_result(13)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13);
+ ALU_result(12)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12);
+ ALU_result(11)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11);
+ ALU_result(10)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10);
+ ALU_result(9)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9); 
+ ALU_result(8)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8);
+ ALU_result(7)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7);
+ ALU_result(6)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6);
+ ALU_result(5)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6)xor a(5);
+ ALU_result(4)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6)xor a(5)xor a(4);
+ ALU_result(3)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6)xor a(5)xor a(4)xor a(3);
+ ALU_result(2)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6)xor a(5)xor a(4)xor a(3)xor a(2);
+ ALU_result(1)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6)xor a(5)xor a(4)xor a(3)xor a(2)xor a(1);
+ ALU_result(0)<= a(63)xor a(62)xor a(61) xor a(60) xor a(59) xor a(58)xor a(57)xor a(56)xor a(55)xor a(54)xor a(53)xor a(52)xor a(51)xor a(50)xor a(49)xor a(48)xor a(47)xor a(46)xor a(45)xor a(44)xor a(43)xor a(42)xor a(41)xor a(40)xor a(39)xor a(38)xor a(37)xor a(36)xor a(35)xor a(34)xor a(33)xor a(32)xor a(31)xor a(30)xor a(29)xor a(28)xor a(27)xor a(26)xor a(25)xor a(24)xor a(23)xor a(22)xor a(21)xor a(20)xor a(19)xor a(18)xor a(17)xor a(16)xor a(15)xor a(14)xor a(13)xor a(12)xor a(11)xor a(10)xor a(9)xor a(8)xor a(7)xor a(6)xor a(5)xor a(4)xor a(3)xor a(2)xor a(1)xor a(0);
+ when others =>
+ ALU_result <= a + b ;
+ NULL;
+ end case;
+ end process;
+ outalu <= ALU_result ;
+ temp <= ('0' & a) + ('0' & b);
+ carryout <= temp(64);
+ end Behavioral;
